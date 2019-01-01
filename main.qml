@@ -9,7 +9,7 @@ ApplicationWindow {
     visible: true
     width: 640
     height: 480
-    title: qsTr("Tabs")
+    title: qsTr("Scanner")
 
     Test {
         id: test
@@ -22,17 +22,23 @@ ApplicationWindow {
     SwipeView {
         id: swipeView
         anchors.fill: parent
-        currentIndex: tabBar.currentIndex
+//        currentIndex: tabBar.currentIndex
 
         Page1Form {
-            button.onClicked: {
-//                console.debug("__ali__")
-//                console.debug(test.getValue())
-//                label.text = qsTr("page form 1 test..")
-                scanner.open()
-
+            wakeup.onClicked: {
+                scanner.wakeup()
+                console.debug("__ali__")
+                ////                label.text = qsTr("debug test..")
             }
-            button.onCanceled: {
+            openLight.onClicked: {
+                scanner.openLight()
+                console.debug("__ali__222222222222")
+                ////                label.text = qsTr("debug test..")
+            }
+            reset.onClicked: {
+                scanner.reset()
+                console.debug("__ali__333333333333")
+                ////                label.text = qsTr("debug test..")
             }
         }
 
@@ -40,22 +46,22 @@ ApplicationWindow {
             label.onTextChanged: {
 }
             button.onClicked: {
-                label.text = qsTr("Tabs")
+                label.text = qsTr("__ali__ ...")
 }
         }
     }
 
-    footer: TabBar {
-        id: tabBar
-        currentIndex: swipeView.currentIndex
+//    footer: TabBar {
+//        id: tabBar
+//        currentIndex: swipeView.currentIndex
 
-        TabButton {
-            text: qsTr("Page 1")
-        }
-        TabButton {
-            text: qsTr("Page 2")
-        }
-    }
+////        TabButton {
+////            text: qsTr("Page 1")
+////        }
+////        TabButton {
+////            text: qsTr("Page 2")
+////        }
+//    }
 
     InputPanel {
         id: inputPanel

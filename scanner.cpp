@@ -2,34 +2,106 @@
 #include "libusb.h"
 #include <QDebug>
 
-Scanner::Scanner(QObject *parent) : QObject(parent)
+Scanner::Scanner(QObject *parent) : QObject(parent), handle(nullptr), timeout(1000)
 {
-    int r;
-    ssize_t cnt;
+    int ret;
 
-    r = libusb_init(NULL);
-    if (r < 0)
+    ret = libusb_init(NULL);
+    if (ret < 0)
         return;
 
-    cnt = libusb_get_device_list(NULL, &devs);
-    if (cnt < 0) {
-        libusb_exit(NULL);
+    handle = libusb_open_device_with_vid_pid(NULL, VENDOR_ID, PRODUCT_ID);
+    if (handle == nullptr) {
+        qDebug() << "Could not find/open Scanner HID device.";
         return;
     }
-    int *p = nullptr;
-    auto abc = p;
+
+    qDebug() << "Successfully find the Scanner HID device.";
+
+    libusb_detach_kernel_driver(handle, 0);
+
+    ret = libusb_set_configuration(handle, 1);
+    if (ret < 0) {
+        qDebug() << "libusb_set_configuration error " << ret;
+        return;
+    }
+    qDebug() << "Successfully set usb configuration 1";
+    ret = libusb_claim_interface(handle, 0);
+    if (ret < 0) {
+        qDebug() << "libusb_claim_interface error %d\n";
+        return;
+    }
+    qDebug() << "Successfully claimed interface";
 }
 
 Scanner::~Scanner()
 {
-    libusb_free_device_list(devs, 1);
+    libusb_release_interface(handle, 0);
+    libusb_close(handle);
     libusb_exit(NULL);
 }
 
-void Scanner::open()
+void Scanner::openLight()
 {
   qDebug() << __FUNCTION__;
-  print_devs(devs);
+  uchar data[0x100] = {0xcc, 0x55, 0x02, 0xff};
+  if (libusb_control_transfer(handle, 0x21, 0x09, 0x301, 0, data,  0x100, timeout) < 0) {
+    qDebug() << "hid write: open light failed.";
+    return;
+  }
+  if (libusb_control_transfer(handle, 0xA1, 0x01, 0x302, 0, data,  0x100, timeout) < 0) {
+      qDebug() << "hid read: open light failed.";
+      return;
+  }
+
+  if (data[0] == 0xbb && data[1] == 0xdd
+          && data[2] == 0x03 && data[3] == 0xff) {
+      qDebug() << "hid read: open light failed. Need reset scanner.";
+      return;
+  }
+  qDebug() << "open light ok.";
+}
+
+void Scanner::wakeup()
+{
+    qDebug() << __FUNCTION__;
+    uchar data[0x100] = {0xcc, 0x55, 0x01, 0xff};
+    if (libusb_control_transfer(handle, 0x21, 0x09, 0x301, 0, data,  0x100, timeout) < 0) {
+      qDebug() << "hid write: open light failed.";
+      return;
+    }
+    if (libusb_control_transfer(handle, 0xA1, 0x01, 0x302, 0, data,  0x100, timeout) < 0) {
+        qDebug() << "hid read: wake up failed.";
+        return;
+    }
+
+    if (data[0] == 0xbb && data[1] == 0xdd
+            && data[2] == 0x03 && data[3] == 0xff) {
+        qDebug() << "hid read: wake up failed. Need reset scanner.";
+        return;
+    }
+    qDebug() << "wake up ok.";
+}
+
+void Scanner::reset()
+{
+    qDebug() << __FUNCTION__;
+    uchar data[0x100] = {0xcc, 0x55, 0x03, 0xff};
+    if (libusb_control_transfer(handle, 0x21, 0x09, 0x301, 0, data,  0x100, timeout) < 0) {
+      qDebug() << "hid write: reset failed.";
+      return;
+    }
+    if (libusb_control_transfer(handle, 0xa1, 0x01, 0x302, 0, data,  0x100, timeout) < 0) {
+        qDebug() << "hid read: reset failed.";
+        return;
+    }
+
+    if (data[0] == 0xbb && data[1] == 0xdd
+            && data[2] == 0x03 && data[3] == 0xff) {
+        qDebug() << "hid read: wake up failed. Need reset scanner.";
+        return;
+    }
+    qDebug() << "reset ok.";
 }
 
 void Scanner::print_devs(libusb_device **devs)

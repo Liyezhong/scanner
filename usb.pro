@@ -43,8 +43,8 @@ else:unix:!macx: LIBS += -L$$PWD/./ -lusb-1.0 -ludev
 INCLUDEPATH += $$PWD/libusb/libusb
 DEPENDPATH += $$PWD/libusb/libusb
 
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/./release/libusb-1.0.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/./debug/libusb-1.0.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/./release/usb-1.0.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/./debug/usb-1.0.lib
-else:unix:!macx: PRE_TARGETDEPS += $$PWD/./libusb-1.0.a
+#win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/./release/libusb-1.0.a
+#else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/./debug/libusb-1.0.a
+#else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/./release/usb-1.0.lib
+#else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/./debug/usb-1.0.lib
+#else:unix:!macx: PRE_TARGETDEPS += $$PWD/./libusb-1.0.a

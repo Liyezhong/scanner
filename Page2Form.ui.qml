@@ -8,14 +8,14 @@ Page {
     property alias button: button
 
     header: Label {
-        text: qsTr("Page 2")
+        text: qsTr("Debug Page")
         font.pixelSize: Qt.application.font.pixelSize * 2
         padding: 10
     }
 
     Label {
         id: label
-        text: qsTr("You are on Page 2.")
+        text: qsTr("test...")
         anchors.centerIn: parent
     }
 
@@ -23,6 +23,6 @@ Page {
         id: button
         x: 93
         y: 46
-        text: qsTr("Button")
+        text: qsTr("debug")
     }
 }
