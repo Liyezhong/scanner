@@ -1,3 +1,6 @@
+[submodule "hidapi"]
+	path = hidapi
+	url = https://github.com/signal11/hidapi.git
 [submodule "libusb"]
 	path = libusb
-	url = https://github.com/Liyezhong/libusb.git
+	url = https://github.com/libusb/libusb.git
